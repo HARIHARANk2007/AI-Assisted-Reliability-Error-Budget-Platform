@@ -24,6 +24,9 @@ Thumbs.db
 *.log
 logs/
 
+# Database files
+*.db
+
 # Test coverage
 .coverage
 htmlcov/
