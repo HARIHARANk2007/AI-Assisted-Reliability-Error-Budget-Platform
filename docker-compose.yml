@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: sre-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sre_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sre_password}
+      POSTGRES_DB: ${POSTGRES_DB:-sre_platform}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sre_user} -d ${POSTGRES_DB:-sre_platform}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sre-network
+
+  # Redis Cache (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: sre-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sre-network
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sre-backend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-sre_user}:${POSTGRES_PASSWORD:-sre_password}@postgres:5432/${POSTGRES_DB:-sre_platform}
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=${DEBUG:-false}
+      - ENABLE_METRICS_SIMULATOR=${ENABLE_METRICS_SIMULATOR:-true}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - sre-network
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sre-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - sre-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  sre-network:
+    driver: bridge

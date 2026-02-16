@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Risk level badges */
+.risk-badge {
+  @apply px-2 py-1 rounded-full text-xs font-semibold uppercase;
+}
+
+.risk-safe {
+  @apply bg-green-500/20 text-green-400;
+}
+
+.risk-observe {
+  @apply bg-yellow-500/20 text-yellow-400;
+}
+
+.risk-danger {
+  @apply bg-orange-500/20 text-orange-400;
+}
+
+.risk-freeze {
+  @apply bg-red-500/20 text-red-400;
+}
+
+/* Card styles */
+.card {
+  @apply bg-gray-800 rounded-lg p-6 shadow-lg;
+}
+
+.card-header {
+  @apply text-lg font-semibold mb-4;
+}
+
+/* Stat card */
+.stat-card {
+  @apply bg-gray-800 rounded-lg p-4 flex flex-col;
+}
+
+.stat-value {
+  @apply text-3xl font-bold;
+}
+
+.stat-label {
+  @apply text-gray-400 text-sm;
+}
+
+/* Button styles */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-colors;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white;
+}
+
+.btn-secondary {
+  @apply bg-gray-700 hover:bg-gray-600 text-white;
+}
+
+/* Animations */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+}
+
+.pulse-animation {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
